@@ -159,7 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }else if(e.target && e.target.classList.contains("rename_img" )){
             renameFormInputData.classList.remove("is-invalid");
             renameFormInputData.value = '';
-            folderNameFoRename = e.target.parentElement.textContent.trim();
             folderIdFoRename = e.target.parentElement.getAttribute('data-id');
             renameModal.show();
         };
