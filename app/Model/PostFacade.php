@@ -92,10 +92,10 @@ final class PostFacade
         }
 	}
 
-	public function addFolder($data){
+	public function addFolder(int $id, string $name){
 		$parentFolder = $this -> database
                 ->table('tree')
-                ->where('id', $data['id'])
+                ->where('id', $id)
                 ->fetch();
         
         $folders = $this -> database
@@ -103,7 +103,7 @@ final class PostFacade
                 ->where('left > ?', $parentFolder -> left)
                 ->where('right < ?', $parentFolder -> right)
                 ->where('deep', $parentFolder -> deep + 1)
-                ->where('name', $data['name']);
+                ->where('name', $name);
         if (count($folders) != 0 ) {
             $result = 'This folder already contains a folder with the same name';
 			return $result;
@@ -128,14 +128,14 @@ final class PostFacade
 
             $this->database
                     ->table('tree')
-                    ->where('id', $data['id'])
+                    ->where('id', $id)
                     ->update(['right' => $parentFolder -> right + 2]);
 
             $query = "UPDATE `tree` SET `left` = `left` + 2, `right` = `right` + 2 WHERE `left` > ?";
             $this->database->query($query, $newFolderLeft);
             
             $this->database->table('tree')->insert([
-                'name' => $data['name'],
+                'name' => $name,
                 'deep' => $parentFolder -> deep + 1,
                 'left' => $newFolderLeft,
                 'right' => $newFolderRight,

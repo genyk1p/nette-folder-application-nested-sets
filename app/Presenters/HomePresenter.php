@@ -28,7 +28,9 @@ final class HomePresenter extends Nette\Application\UI\Presenter
     // Method that adds folders.
     public function actionAdd(){
         $data = $this->getRequest()->getPost();
-        $result = $this -> facade -> addFolder($data);
+        $name = $data['name'];
+        $id = (int)$data['id'];
+        $result = $this -> facade -> addFolder($id, $name);
         $this->sendJson(['snippets' => ['result' => $result]]);
     }
 
