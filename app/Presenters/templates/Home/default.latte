@@ -1,98 +1,120 @@
 {block content}
 <div class="container">
-        <h1 n:block="title" class="h1 mb-3">Folder Application</h1>
-        <form id="addForm" action="{link Home:add}" method="POST" class="row g-3 pb-5">
-            <div class="col-auto">
-                <label for="add-form-input-data" class="col-form-label">Folder name</label>
-            </div>
-            <div class="col-auto">
-                <input class="form-control" type="text" name="name" id="add-form-input-data" placeholder="Folder name">
-                <input type="hidden" name="id" id="add-form-id" value="">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary" id="addForm-submit">Add Folder</button>
-            </div>
-        </form>
-
-    <nav aria-label="breadcrumb row">
-    <ol class="breadcrumb" id = 'breadcrumb_path'>
-    </ol>
-    </nav>
-    
-    <div class="row my-row border border-2 rounded">
-        <div class="col-auto">
-            <div class="folders">
-
-            </div>
-        </div>
+    <h1 n:block="title" class="h1 mb-3">Folder Application</h1>
+    <div n:snippet="foldersSnippet">
+      {form addForm class => 'ajax row g-3 pb-5', id => 'addForm'}
+          <div class="col-auto">
+              <label for="add-form-input-data" class="col-form-label">{$form['name']->label}</label>
+          </div>
+          <div class="col-auto">
+              <input n:name="name" class="form-control {if $form['name']->hasErrors()}is-invalid{/if}" id="add-form-input-data" placeholder="Folder name">
+              {if $form['name']->hasErrors()}
+                  <div class="invalid-feedback">
+                      {$form['name']->getErrors()[0]}
+                  </div>
+              {/if}
+              <input n:name="id" type="hidden" id="add-form-id" value="{$id}">
+          </div>
+          <div class="col-auto">
+              <button n:name="submit" class="btn btn-primary" id="addForm-submit">Add Folder</button>
+          </div>
+      {/form}
+    </div>
+    <div n:snippet="contentSnippet">
+      <nav aria-label="breadcrumb row">
+        <ol class="breadcrumb" id = 'breadcrumb_path'>
+          <li class="breadcrumb-item active" aria-current="page">Path</li>
+          <li n:foreach="$path as $item" class="breadcrumb-item active">
+            <a n:href="default, $item['id']" class="folder_link">{$item['name']}</a>
+          </li>
+          <li class="breadcrumb-item active"><a n:href="default, $id" class="folder_link">{$name}</a></li>
+        </ol>
+      </nav>
+      <div class="row my-row border border-2 rounded">
+          <div class="col-auto">
+              <div class="folders">
+                <div n:foreach="$folders as $folder" class="folder">
+                  <div class="folder-menu bg-primary-subtle">
+                    <button type="button" class="btn-rename" data-bs-toggle="modal" data-bs-target="#renameModal">
+                      <a n:href="showRenameModal!, renameId => $folder['id']" class="ajax hiden-id-link"></a>
+                    </button>
+                    <button type="button" class="btn-trash ajax" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                      <a n:href="showDeleteModal!, deleteId => $folder['id']" class="ajax hiden-id-link"></a>
+                    </button>
+                    
+                  </div>
+                  <a n:href="default, $folder['id']" class="ajax folder-link btn btn-primary btn-lg">{$folder['name']}</a>
+                </div>
+              </div>
+          </div>
+      </div>
     </div>
 </div>
-<div id="getFoldersUrl" style="display: none;">{link Home:getfolders "1"}</div>
-<div id="getPathUrl" style="display: none;">{link Home:getpath "2"}</div>
-<div id="getRenameUrl" style="display: none;">{link Home:rename "newName", "itemId"}</div>
-<div id="getDeleteUrl" style="display: none;">{link Home:delete 0}</div>
-
 
 <!-- Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="deleteModalLabel">Do you want to delete <span class="fw-bold" id=folder_name_in_span></span> folder?</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Once you click the delete button, the folder will be permanently deleted from the database! All subfolders will also be deleted!
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delet-btn">Delete</button>
+
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deleteModalLabel">Do you want to delete <span class="fw-bold" id=folder_name_in_span></span> folder?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Once you click the delete button, the folder will be permanently deleted from the database! All subfolders will also be deleted!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="delet-btn">
+            Delete
+            <div n:snippet="deleteModalSnippet">
+              {ifset $deleteId}
+                <a n:href="deleteFolder!, deleteId1 => $deleteId" class="ajax hiden-id-link"></a>
+              {/ifset}
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="modal fade" id="renameFormModal" tabindex="-1" aria-labelledby="renameFormModalLabel" aria-hidden="true">
+<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="renameModalLabel">Please enter a new folder name</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="renameForm" method="POST" class="pb-3">
+      <div n:snippet="renameModalSnippet">
+        <form n:name=renameForm class="ajax pb-3">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="renameModalLabel">Please enter a new folder name</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
             <div class="col-auto">
                 <label for="rename-form-input-data" class="col-form-label">Folder name</label>
             </div>
             <div class="col-auto">
-                <input class="form-control" type="text" name="newName" id="rename-form-input-data" placeholder="Folder name">
-                <div class="invalid-feedback">
-                  Please enter a folder name!
-                </div>
+              <input n:name="newName" class="form-control {if $form['newName']->hasErrors()}is-invalid{/if}" id="rename-form-input-data" placeholder="Folder name">
+              {if $form['newName']->hasErrors()}
+                  <div class="invalid-feedback">
+                      {$form['newName']->getErrors()[0]} 
+                  </div>
+              {/if}
+              <input n:name="renameId" type="hidden" id="rename-form-id">
             </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="rename-cancel-btn">Cancel</button>
+            <button n:name="submit" type="submit" class="btn btn-danger" id="rename-submit-btn">Submit</button>
+          </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" id="rename-submit-btn">Submit</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="renameWarningModal" tabindex="-1" aria-labelledby="renameWarningModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="renameWarningModalLabel">There is already such a folder in this directory!</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Text
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue</button>
-      </div>
-    </div>
-  </div>
+<div n:snippet="markerSnippet">
+  {if isset($markerValue)}
+    <script>
+      document.getElementById('rename-cancel-btn').click();
+    </script>
+  {/if}
 </div>

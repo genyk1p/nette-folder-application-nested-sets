@@ -1,32 +1,74 @@
 body{
     padding-top: 40px;
 }
+.container .folders{
+    display: flex;
+    margin-bottom: 10px;
+}
 .container .folders .folder{
     margin: 10px;
     width: 120px;
-    height: 60px;
-    white-space: nowrap;
-    overflow: hidden; 
-    text-overflow: ellipsis; 
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+}
+.container .folders .folder .folder-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 7px;
+    margin: 2px;
+    border-radius: 10px;
+    width: 95%;
+}
+.container .folders .folder .folder-menu .hiden-id-link{
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 18px;
+    height: 20px;
+}
+#delet-btn {
     position: relative;
 }
-.container .folders .folder .trash_img{
+#delet-btn .hiden-id-link {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 2px;
-    right: 2px;
-    z-index: 10;
-    cursor: pointer;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 57px;
+    height: 30px;
 }
-.container .folders .folder .rename_img{
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    top: 2px;
-    left: 2px;
-    z-index: 10;
+.container .folders .folder .folder-link{
+    width: 120px;
+    text-overflow: ellipsis;
+    overflow: hidden; 
+    white-space: nowrap;
+}
+.container .folders .folder .btn-trash{
+    position: relative;
+    background-image: url('../img/red-trash-can-icon.svg');
+    background-size: cover;
+    background-color: transparent;
+    width: 18px;
+    height: 20px;
     cursor: pointer;
+    overflow: hidden;
+    border: none;
+}
+.container .folders .folder .btn-rename{
+    position: relative;
+    background-image: url('../img/rename-icon.svg');
+    background-size: cover;
+    background-color: transparent;
+    width: 18px;
+    height: 20px;
+    cursor: pointer;
+    overflow: hidden;
+    border: none;
 }
 .my-row{
     max-height: 600px;

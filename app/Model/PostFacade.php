@@ -9,6 +9,14 @@ final class PostFacade
 		private Nette\Database\Explorer $database,
 	) {
 	}
+    public function getFolderName(int $id){
+        $folder = $this->database
+            ->table('tree')
+            ->where('id', $id)
+            ->fetch();
+        return $folder->name;
+    }
+
 	public function getPath(int $id){
 		$folder = $this->database
 		->table('tree')
@@ -38,7 +46,6 @@ final class PostFacade
 		->table('tree')
 		->where('id', $id)
 		->fetch();
-
 		$folders = $this->database
 			->table('tree')
 			->where('left > ?', $folder -> left)
@@ -79,7 +86,7 @@ final class PostFacade
                 ->fetch();
 
         if ($folderWithSameName){
-            $message = "A folder with the same name already exists";
+            $message = 0;
 			return $message;
         } else {
             $this->database
@@ -87,7 +94,7 @@ final class PostFacade
                     ->where('id', $id)
                     ->update(['name' => $newName]);
 
-            $message = "The folder was successfully renamed";
+            $message = 1;
 			return $message;
         }
 	}
@@ -105,7 +112,7 @@ final class PostFacade
                 ->where('deep', $parentFolder -> deep + 1)
                 ->where('name', $name);
         if (count($folders) != 0 ) {
-            $result = 'This folder already contains a folder with the same name';
+            $result = 0;
 			return $result;
         } else {
 
@@ -140,7 +147,7 @@ final class PostFacade
                 'left' => $newFolderLeft,
                 'right' => $newFolderRight,
             ]);
-			$result = 'Folder added successfully';
+            $result = 1;
 			return $result;
         }
 	}
